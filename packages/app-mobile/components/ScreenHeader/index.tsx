@@ -25,11 +25,6 @@ import { ContainerType } from '@joplin/lib/services/plugins/WebviewController';
 import { Dispatch } from 'redux';
 import WarningBanner from './WarningBanner';
 
-// We need this to suppress the useless warning
-// https://github.com/oblador/react-native-vector-icons/issues/1465
-// eslint-disable-next-line no-console, @typescript-eslint/no-explicit-any -- Old code before rule was applied
-Icon.loadFont().catch((error: any) => { console.info(error); });
-
 // Rather than applying a padding to the whole bar, it is applied to each
 // individual component (button, picker, etc.) so that the touchable areas
 // are widder and to give more room to the picker component which has a larger
@@ -39,12 +34,17 @@ const PADDING_V = 10;
 type OnSelectCallbackType=()=> void;
 type OnPressCallback=()=> void;
 
-export interface MenuOptionType {
+export type MenuOptionType = {
 	onPress: OnPressCallback;
 	isDivider?: boolean;
 	title: string;
 	disabled?: boolean;
-}
+}|{
+	isDivider: true;
+	title?: undefined;
+	onPress?: undefined;
+	disabled?: false;
+};
 
 interface ScreenHeaderProps {
 	selectedNoteIds: string[];
@@ -432,8 +432,10 @@ class ScreenHeaderComponent extends PureComponent<ScreenHeaderProps, ScreenHeade
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any -- Old code before rule was applied
 		const pluginPanelToggleButton = (styles: any, onPress: OnPressCallback) => {
 			const allPluginViews = Object.values(this.props.plugins).map(plugin => Object.values(plugin.views)).flat();
-			const allPanels = allPluginViews.filter(view => view.containerType === ContainerType.Panel);
-			if (allPanels.length === 0) return null;
+			const allVisiblePanels = allPluginViews.filter(
+				view => view.containerType === ContainerType.Panel && view.opened,
+			);
+			if (allVisiblePanels.length === 0) return null;
 
 			return (
 				<CustomButton
