@@ -352,7 +352,7 @@ const CodeMirror = (props: NoteBodyEditorProps, ref: ForwardedRef<NoteBodyEditor
 
 		return {
 			language: isHTMLNote ? EditorLanguageType.Html : EditorLanguageType.Markdown,
-			readOnly: props.disabled || props.visiblePanes.indexOf('editor') < 0,
+			readOnly: props.disabled,
 			katexEnabled: Setting.value('markdown.plugin.katex'),
 			themeData: {
 				...styles.globalTheme,
@@ -366,8 +366,7 @@ const CodeMirror = (props: NoteBodyEditorProps, ref: ForwardedRef<NoteBodyEditor
 			indentWithTabs: true,
 		};
 	}, [
-		props.contentMarkupLanguage, props.disabled, props.visiblePanes,
-		props.keyboardMode, styles.globalTheme,
+		props.contentMarkupLanguage, props.disabled, props.keyboardMode, styles.globalTheme,
 	]);
 
 	// Update the editor's value
@@ -386,6 +385,7 @@ const CodeMirror = (props: NoteBodyEditorProps, ref: ForwardedRef<NoteBodyEditor
 					ref={editorRef}
 					settings={editorSettings}
 					pluginStates={props.plugins}
+					onPasteFile={null}
 					onEvent={onEditorEvent}
 					onLogMessage={logDebug}
 					onEditorPaste={onEditorPaste}
